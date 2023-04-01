@@ -20,53 +20,27 @@
         executable: /bin/bash
       ignore_errors: true
     
-    - name: refresh the docker group
-      ansible.builtin.shell: sudo -u $USER newgrp docker
-      args:
-        executable: /bin/bash
-      ignore_errors: true 
+    # - name: refresh the docker group
+    #   ansible.builtin.shell: sudo -u $USER newgrp docker
+    #   args:
+    #     executable: /bin/bash
+    #   ignore_errors: true 
     
     - name: enable at boot and restart docker
       ansible.builtin.service:
         name: docker
         state: restarted
-        sleep: 30
         enabled: true
-      # ansible.builtin.shell: | 
-      #   service docker start
-      #   usermod -a -G docker ec2-user
-      #   newgrp docker
-      #   systemctl enable docker.service
-      #   systemctl start docker.service
-      # args:
-      #   executable: /bin/bash
-      # ignore_errors: true
-# - name: nginxplaybook 
-#   hosts: webservers
-#   become: true
-  
-#   tasks:
-#     - name: install docker
-#       ansible.builtin.yum:
-#         name: docker
-#         state: latest
-      # shell: | 
-      #   yum install docker
-      #   service docker start
-      #   usermod -a -G docker ec2-user
-      #   newgrp docker
-      #   systemctl enable docker.service
-      #   systemctl start docker.service
-      # args:
-      #   executable: /bin/bash
-      # ignore_errors: true
 
-    # - name: docker pull & run
-    #   shell: | 
-    #     docker rmi adelekegbolahan/nginx-image --force
-    #     docker pull adelekegbolahan/nginx-image:latest
-    #     docker rm nginx_container --force
+    - name: docker pull & run
+      ansible.builtin.shell: |
+        docker rmi adelekegbolahan/nginx-image --force
+        docker pull adelekegbolahan/nginx-image:latest
+        docker rm nginx_container --force
+      args:
+        executable: /bin/bash
+      ignore_errors: true
 
-    # - name: run application container
-    #   shell: |  
-    #      docker run -dit --name nginx_container -p 7000:8000 -p 443:443 adelekegbolahan/nginx-image:latest
+    - name: run application container
+      ansible.builtin.shell: |
+        docker run -dit --name nginx_container -p 7000:8000 -p 443:443 adelekegbolahan/nginx-image:latest
