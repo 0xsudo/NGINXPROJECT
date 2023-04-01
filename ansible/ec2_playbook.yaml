@@ -1,26 +1,46 @@
-- name: nginxplaybook 
+- name: nginxpalbook
   hosts: webservers
   become: true
-  
+
   tasks:
     - name: install docker
-      shell: | 
-        yum install docker
-        service docker start
-        usermod -a -G docker ec2-user
-        newgrp docker
-        systemctl enable docker.service
-        systemctl start docker.service
+      ansible.builtin.yum:
+        name: docker
+        state: latest
+    
+    - name: setup docker
+      ansible.builtin.service:
+        name:  docker
+        state: started
+    
+    - name: add user to docker group
+      ansible.builtin.shell:
+        cmd: sudo usermod -aG docker ec2-user
+      args:
+        executable: /bin/bash
+      ignore_errors: true
+    
+    # - name: refresh the docker group
+    #   ansible.builtin.shell: sudo -u $USER newgrp docker
+    #   args:
+    #     executable: /bin/bash
+    #   ignore_errors: true 
+    
+    - name: enable at boot and restart docker
+      ansible.builtin.service:
+        name: docker
+        state: restarted
+        enabled: true
+
+    - name: docker pull & run
+      ansible.builtin.shell: |
+        docker rmi adelekegbolahan/nginx-image --force
+        docker pull adelekegbolahan/nginx-image:latest
+        docker rm nginx_container --force
       args:
         executable: /bin/bash
       ignore_errors: true
 
-    - name: docker pull & run
-      shell: | 
-        docker rmi adelekegbolahan/nginx-image --force
-        docker pull adelekegbolahan/nginx-image:latest
-        docker rm nginx_container --force
-
     - name: run application container
-      shell: |  
-         docker run -dit --name nginx_container -p 7000:7000 -p 443:443 adelekegbolahan/nginx-image:latest
+      ansible.builtin.shell: |
+        docker run -dit --name nginx_container -p 7000:8000 -p 443:443 adelekegbolahan/nginx-image:latest
