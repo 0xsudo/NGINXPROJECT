@@ -49,7 +49,9 @@ pipeline {
         stage('Ansible') {
             steps {
                 script {
-                    sh 'ansible-playbook -i ansible/aws_instance ansible/ec2_playbook.yaml -vvv'
+                    retry(count: 3) {
+                        sh 'ansible-playbook -i ansible/aws_instance ansible/ec2_playbook.yaml -vvv'
+                    }
                 }
             }
         }
