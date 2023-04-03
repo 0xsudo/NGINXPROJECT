@@ -42,7 +42,7 @@ pipeline {
         stage('Wait For Deployment') {
             steps {
                 script {
-                    sh 'sleep 240'
+                    sh 'sleep 20'
                 }
             }
         }
@@ -50,6 +50,7 @@ pipeline {
             steps {
                 script {
                     retry(count: 3) {
+                        sh 'echo "GOOD"'
                         // sh 'ansible-playbook -i ansible/aws_instance ansible/ec2_playbook.yaml -vvv'
                     }
                 }
